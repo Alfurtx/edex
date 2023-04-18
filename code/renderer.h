@@ -4,7 +4,11 @@
 #include "common.h"
 #define VERTCAP (3 * 640 * 1000)
 
-struct Vertex { vec2 pos, uv, color; };
+struct Vertex {
+	vec2 pos;
+	vec2 uv;
+	vec4 color;
+};
 enum UniformSlot {
 	UNIFORM_TIME = 0,
 	UNIFORM_RESOLUTION,
@@ -16,7 +20,6 @@ enum Shader {
 	SHADER_TEXT,
 	SHADER_COUNT
 };
-
 struct Renderer {
 	uint vao, vbo;
 	uint programs[SHADER_COUNT];
@@ -25,19 +28,23 @@ struct Renderer {
 	Vertex verticies[VERTCAP];
 	usize verticies_count;
 
+	struct {
+		bool polymode;
+	} flags;
+
 	vec2 camera_pos;
 	vec2 resolution;
 	float time;
 };
 
-void renderer_init(Renderer* r);
+void renderer_init(Renderer* r, GLFWwindow* window);
 void renderer_set_shader(Renderer* r, Shader s);
 void renderer_flush(Renderer* r);
 void renderer_sync(Renderer* r);
 void renderer_draw(Renderer* r);
 
 void renderer_push_vertex(Renderer* r, vec2 pos, vec4 col, vec2 uv);
-void renderer_push_rect(Renderer* r, vec2 p, vec2 s, vec4 c);
+void renderer_push_rect(Renderer* r, vec2 pos, vec2 size, vec4 color);
 void renderer_push_image_rect(Renderer* r, vec2 p, vec2 s, vec2 uvp, vec2 uvs, vec4 c);
 void renderer_push_triangle(Renderer* r,
 			    vec2 p0,  vec2 p1,  vec2 p2,

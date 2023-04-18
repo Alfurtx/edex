@@ -2,6 +2,7 @@
 #define COMMON_H
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -22,6 +23,7 @@ union vec2 {
 	float E[2];
 	struct { float x, y; };
 	float& operator[](usize index) { return E[index]; }
+	vec2 operator+(vec2 b) { return vec2{.x = this->x + b.x, .y = this->y + b.y}; }
 };
 union vec4 {
 	float E[4];
@@ -29,5 +31,7 @@ union vec4 {
 	struct { float r, g, b, a; };
 	float& operator[](usize index) { return E[index]; }
 };
+
+char* load_file(const char* filepath);
 
 #endif // COMMON_H
