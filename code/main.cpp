@@ -1,28 +1,15 @@
 #include "common.h"
 #include "renderer.h"
+#include "glyph.h"
 
-struct GlyphInfo {
-	float ax, ay;
-	float bw;
-	float bh;
-	float bl;
-	float bt;
-	float tx;
-};
+const char* testline = "HOLA NUEVO MUNDO";
 
-struct GlyphAtlas {
-	uint width;
-	uint height;
-	uint texid;
-	GlyphInfo characters[GLYPH_CAP];
-};
-
-GlyphAtlas ca;
 FT_Library ftlibrary;
 FT_Face ftface;
 GLFWwindow* window;
 const char* fontpath = "w:\\edex\\fonts\\liberation_mono.ttf";
-static Renderer renderer = {0};
+static Renderer renderer = {};
+static GlyphAtlas ga = {};
 
 void message_debug(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 void resize_window(GLFWwindow* wnd, int w, int h);
@@ -59,41 +46,7 @@ main(void)
 
 	FT_Set_Pixel_Sizes(ftface, 0, FONTSIZE);
 
-	/* Character Atlas Init */
-	{
-		for(uint i = 32; i < 128; i++) {
-			FT_Load_Char(ftface, i, FT_LOAD_RENDER);
-			ca.width += ftface->glyph->bitmap.width;
-			ca.height = Max(ca.height, ftface->glyph->bitmap.rows);
-		}
-		glActiveTexture(GL_TEXTURE0);
-		glGenTextures(1, &ca.texid);
-		glBindTexture(GL_TEXTURE_2D, ca.texid);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, (usize)ca.width, (usize)ca.height, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
-
-		uint x = 0;
-		for(uint i = 32; i < 128; i++) {
-			FT_Load_Char(ftface, i, FT_LOAD_RENDER);
-			ca.characters[i] = {
-				.ax = (float) (ftface->glyph->advance.x >> 6),
-				.ay = (float) (ftface->glyph->advance.y >> 6),
-				.bw = (float) ftface->glyph->bitmap.width,
-				.bh = (float) ftface->glyph->bitmap.rows,
-				.bl = (float) ftface->glyph->bitmap_left,
-				.bt = (float) ftface->glyph->bitmap_top,
-				.tx = (float) x / (float) ca.width
-			};
-			glPixelStorei(GL_UNPACK_ALIGNMENT,1);
-			glTexSubImage2D(GL_TEXTURE_2D, 0, x, 0, ftface->glyph->bitmap.width, ftface->glyph->bitmap.rows, GL_RED, GL_UNSIGNED_BYTE, ftface->glyph->bitmap.buffer);
-			x += ftface->glyph->bitmap.width;
-		}
-	}
-
+	glyph_atlas_init(&ga, ftface);
 	renderer_init(&renderer, window);
 
 	while(!glfwWindowShouldClose(window)) {
@@ -103,9 +56,14 @@ main(void)
 		{
 			vec4 b = {.r=0, .g=0, .b=1, .a=1};
 			vec4 r = {.r=1, .g=0, .b=0, .a=1};
+			vec4 g = {.r=0, .g=1, .b=0, .a=1};
 			renderer_set_shader(&renderer, SHADER_COLOR);
 			renderer_push_rect(&renderer, vec2{.x=0, .y = 0}, vec2{100, 100}, r);
 			renderer_push_rect(&renderer, vec2{.x=0, .y = 100}, vec2{100, 100}, b);
+			renderer_flush(&renderer);
+
+			renderer_set_shader(&renderer, SHADER_TEXT);
+			glyph_atlas_render_line(&ga, &renderer, testline, strlen(testline), vec2{0, 0}, g);
 			renderer_flush(&renderer);
 		}
 

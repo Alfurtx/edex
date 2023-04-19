@@ -28,6 +28,8 @@ struct Renderer {
 	Vertex verticies[VERTCAP];
 	usize verticies_count;
 
+	GLFWwindow* window;
+
 	struct {
 		bool polymode;
 	} flags;

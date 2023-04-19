@@ -9,13 +9,14 @@ uniform vec2 u_camera_pos;
 uniform vec4 u_time;
 
 out vec4 out_color;
+out vec2 out_uv;
 
 mat4
 ortho_mat(void) {
   float l = 0.0f; // left
   float r = u_resolution.x; // right
-  float t = 0.0f; // top
-  float b = u_resolution.y; // bottom
+  float b = 0.0f; // bottom
+  float t = u_resolution.y; // top
   float n = 0.0f; // near
   float f = 4000.0f; // far
 
@@ -27,9 +28,18 @@ ortho_mat(void) {
   return projection;
 }
 
+vec2
+camera_project(vec2 point)
+{
+  float camera_scale = 1.0f;
+  return 2.0f * (point - u_camera_pos) / u_resolution;
+}
+
 void
 main(void)
 {
   out_color = col;
+  out_uv = uv;
   gl_Position = ortho_mat() * vec4(pos.xy, 0.0, 1.0);
+  // gl_Position = vec4(camera_project(pos),0,1);
 }

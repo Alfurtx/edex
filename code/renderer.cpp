@@ -85,6 +85,7 @@ renderer_init(Renderer* r, GLFWwindow* window)
 	r->resolution = {(float) w, (float) h};
 	r->camera_pos = {0};
 	r->time = (float)glfwGetTime();
+	r->window = window;
 
 	create_programs(r);
 }
@@ -92,6 +93,9 @@ renderer_init(Renderer* r, GLFWwindow* window)
 void
 renderer_set_shader(Renderer* r, Shader s)
 {
+	int w,h; glfwGetWindowSize(r->window, &w, &h);
+	r->resolution = {(float) w, (float) h};
+
 	r->current_shader = s;
 	glUseProgram(r->programs[s]);
 	for(uint i = 0; i < UNIFORM_COUNT; i++) {
@@ -146,14 +150,6 @@ renderer_push_rect(Renderer* r, vec2 pos, vec2 size, vec4 color)
 			   pos + size,
 			   color,color,color,color,
 			   uv,uv,uv,uv);
-
-	// renderer_push_quad(r,
-	// 		   pos,
-	// 		   vec2{.x = pos.x + size.x, .y = 0.0},
-	// 		   vec2{.x = 0.0, .y = size.y + pos.y},
-	// 		   vec2{.x = pos.x + size.x, .y = pos.y + size.y},
-	// 		   color,color,color,color,
-	// 		   uv,uv,uv,uv);
 }
 
 void
@@ -162,12 +158,12 @@ renderer_push_image_rect(Renderer* r, vec2 p, vec2 s, vec2 uvp, vec2 uvs, vec4 c
 	renderer_push_quad(r,
 			   p,
 			   vec2{.x = p.x + s.x, .y = p.y},
-			   vec2{.x = p.x,          .y = p.y + s.y},
+			   vec2{.x = p.x,       .y = p.y + s.y},
 			   vec2{.x = p.x + s.x, .y = p.y + s.y},
 			   c,c,c,c,
 			   uvp,
 			   vec2{.x = uvp.x + uvs.x, .y = uvp.y},
-			   vec2{.x = uvp.x, .y = uvp.y + uvs.y},
+			   vec2{.x = uvp.x,         .y = uvp.y + uvs.y},
 			   uvp + uvs);
 }
 

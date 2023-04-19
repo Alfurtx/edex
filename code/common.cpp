@@ -27,5 +27,6 @@ load_file(const char* filepath)
 	char* result = (char*) malloc(sizeof(char) * filesize);
 	fread(result, 1, filesize, f);
 	fclose(f);
+	result[filesize] = '\0';
 	return(result);
 }
