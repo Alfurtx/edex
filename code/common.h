@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -15,6 +16,9 @@
 #define SCREEN_H 1080
 #define Max(a, b) ((a) < (b) ? (b) : (a))
 #define FONTSIZE 48
+#define DEFAULT_CAP 512
+
+#define GLYPH_SET 32 // set at 32 cause thats the value unicode non-special characters start
 #define GLYPH_CAP 128
 
 typedef unsigned int uint;
@@ -33,6 +37,46 @@ union vec4 {
 	float& operator[](usize index) { return E[index]; }
 };
 
+struct Buffer {
+	char* items;
+	usize cap;
+	usize count;
+};
+
 char* load_file(const char* filepath);
+
+#define buffer_append(buf, item)					\
+	do {								\
+		if((buf)->count >= (buf)->cap) {			\
+			(buf)->cap = (buf)->cap == 0 ? DEFAULT_CAP : (buf)->cap*2; \
+			(buf)->items = (Line*)realloc((buf)->items, (buf)->cap * sizeof(*(buf)->items)); \
+			assert((buf)->items && "Realloc Failed");	\
+		}							\
+		(buf)->items[(buf)->count++] = (item);			\
+	} while(0)
+#define buffer_append_many(buf, mitems, icount)				\
+	do {								\
+		if((buf)->count + icount > (buf)->cap) {		\
+			if((buf)->cap == 0) {				\
+				(buf)->cap = DEFAULT_CAP;		\
+			}						\
+			while((buf)->count + icount >= (buf)->cap) {	\
+				(buf)->cap *= 2;			\
+			}						\
+			(buf)->items = (char*)realloc((buf)->items, (buf)->cap * sizeof(*(buf)->items)); \
+			assert((buf)->items && "Realloc Failed");	\
+		}							\
+		memcpy((buf)->items + (buf)->count, mitems, icount * sizeof(*(buf)->items)); \
+		(buf)->count += icount;					\
+	} while(0)
+#define buffer_append_cstr(buf, _str)		\
+	do {					\
+		const char* _s = (_str);	\
+		size_t n = strlen(_s);		\
+		buffer_append_many(buf, _s, n);	\
+	} while(0)
+#define buffer_append_null(buf) buffer_append_many(buf, "", 1)
+
+
 
 #endif // COMMON_H

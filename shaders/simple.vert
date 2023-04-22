@@ -40,6 +40,6 @@ main(void)
 {
   out_color = col;
   out_uv = uv;
-  gl_Position = ortho_mat() * vec4(pos.xy, 0.0, 1.0);
-  // gl_Position = vec4(camera_project(pos),0,1);
+  // gl_Position = ortho_mat() * vec4(pos.xy, 0.0, 1.0);
+  gl_Position = vec4(camera_project(pos).xy,0,1);
 }

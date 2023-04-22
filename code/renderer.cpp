@@ -83,7 +83,7 @@ renderer_init(Renderer* r, GLFWwindow* window)
 	int w,h; glfwGetWindowSize(window, &w, &h);
 	r->verticies_count = 0;
 	r->resolution = {(float) w, (float) h};
-	r->camera_pos = {0};
+	r->camera_pos = {};
 	r->time = (float)glfwGetTime();
 	r->window = window;
 

@@ -1,5 +1,21 @@
 #include "glyph.h"
 
+static void
+glyph_atlas_set_descender_ascender(GlyphAtlas* ga, FT_Face face)
+{
+	ga->descender = 0;
+	ga->glyph_height = 0;
+	for(uint i = 32; i < 128; i++) {
+		FT_Load_Char(face, i, FT_LOAD_RENDER);
+		long d = (face->glyph->metrics.height >> 6) - (face->glyph->metrics.horiBearingY >> 6);
+		ga->descender = d > ga->descender ? d : ga->descender;
+
+		FT_Glyph_Metrics m = face->glyph->metrics;
+		long a = m.height >> 6;
+		ga->glyph_height = a > ga->glyph_height ? a : ga->glyph_height;
+	}
+}
+
 void
 glyph_atlas_init(GlyphAtlas* ga, FT_Face ftface)
 {
@@ -7,6 +23,8 @@ glyph_atlas_init(GlyphAtlas* ga, FT_Face ftface)
 		FT_Load_Char(ftface, i, FT_LOAD_RENDER);
 		ga->width += ftface->glyph->bitmap.width;
 		ga->height = Max(ga->height, ftface->glyph->bitmap.rows);
+		ga->line_spacing = ftface->size->metrics.height >> 6;
+		glyph_atlas_set_descender_ascender(ga, ftface);
 	}
 	glActiveTexture(GL_TEXTURE0);
 	glGenTextures(1, &ga->texid);
@@ -48,7 +66,7 @@ glyph_atlas_render_line(GlyphAtlas* a, Renderer* r,
 		}
 		GlyphInfo gi = a->characters[char_index];
 		float x = pos.x + gi.bl;
-		float y = -pos.y - gi.bt;
+		float y = pos.y - gi.bt;
 		float w = gi.bw;
 		float h = gi.bh;
 		pos.x += gi.ax;

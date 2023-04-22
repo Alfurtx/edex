@@ -1,0 +1,29 @@
+TEXTO DE PRUEBA
+
+#include <stdio.h>
+
+int main() {
+    printf("Hola Mundo\n");
+}
+
+g(){}[];_yYTOpjkl+*-/\
+
+(e->atlas->line_spacing)
+
+void editor_init(Editor* e, GLFWwindow* wnd, GlyphAtlas* a) {
+     e->atlas = a;
+     e->window = wnd;
+     e->filepath = 0;
+}
+
+void EditorLoadFile(Editor* e, const char* filepath) {
+     e->data.count = 0;
+     e->filepath = (char*)filepath;
+     char* file = LoadFile(filepath);
+     buffer_append_cstr(&e->data, file);
+     free(file);
+     rebuild_lines(e);
+}
+
+
+editor->atlas;

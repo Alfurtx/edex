@@ -5,12 +5,12 @@
 #include "renderer.h"
 
 struct GlyphInfo {
-	float ax, ay;
-	float bw;
-	float bh;
-	float bl;
-	float bt;
-	float tx;
+	float ax, ay; // advance (x,y)
+	float bw; // bitmap.width
+	float bh; // bitmap.rows (aka. height)
+	float bl; // bitmap_left
+	float bt; // bitmap_top
+	float tx; // texture_x_pos
 };
 
 struct GlyphAtlas {
@@ -18,6 +18,11 @@ struct GlyphAtlas {
 	uint height;
 	uint texid;
 	GlyphInfo characters[GLYPH_CAP];
+
+	/* font info */
+	uint line_spacing;
+	long descender;
+	long glyph_height;
 };
 
 void glyph_atlas_init(GlyphAtlas* ga, FT_Face ftface);
