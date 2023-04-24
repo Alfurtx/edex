@@ -2,9 +2,23 @@
 #define COMMON_H
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 #include <assert.h>
+
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#include <stdlib.h>
+
+#if 0
+# if defined(DEBUG_MEMLEAK) && defined(_WIN32)
+#  define _CRTDBG_MAP_ALLOC
+#  include <stdlib.h>
+#  include <crtdbg.h>
+# else
+#  include <stdlib.h>
+# endif
+#endif
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -17,10 +31,14 @@
 #define Max(a, b) ((a) < (b) ? (b) : (a))
 #define FONTSIZE 48
 #define DEFAULT_CAP 512
+#define KB(v) (1024LL * v)
+#define MB(v) (1024LL * KB(v))
+#define GB(v) (1024LL * MB(v))
 
 #define GLYPH_SET 32 // set at 32 cause thats the value unicode non-special characters start
 #define GLYPH_CAP 128
 
+typedef uint8_t u8;
 typedef unsigned int uint;
 typedef size_t usize;
 

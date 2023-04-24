@@ -70,11 +70,18 @@ cursor_get_width(Editor* e) {
 }
 
 void
-editor_init(Editor* e, GLFWwindow* wnd, GlyphAtlas* ga)
+editor_init(Editor* e, GLFWwindow* wnd, GlyphAtlas* ga, Arena* a)
 {
 	e->atlas = ga;
 	e->window = wnd;
 	e->filepath = 0;
+	e->arena = a;
+
+	int w,h; glfwGetWindowSize(wnd, &w, &h);
+	e->camera_limits = {
+		.x = w/2.0f, .y = -w/2.0f,
+		.z = h/2.0f, .w = -h/2.0f
+	};
 }
 
 void
@@ -94,7 +101,6 @@ editor_render(Editor* e, Renderer* r)
 	int w,h; glfwGetWindowSize(e->window, &w, &h);
 	r->resolution = vec2{(float)w,(float)h};
 	r->time = (float)glfwGetTime();
-	r->camera_pos = vec2{0.0f,0.0f};
 
 	/* Cursor info */
 	vec2 cursorpos = {};
@@ -119,7 +125,7 @@ editor_render(Editor* e, Renderer* r)
 	/* Text renderer */
 	{
 		renderer_set_shader(r, SHADER_TEXT);
-		for(usize i = 0; i < e->data.count; i++) {
+		for(usize i = 0; i < e->lines.count; i++) {
 			vec2 t = vec2{
 				-(w/2.0f),
 				(float) (-h / 2.0f) + (i + 1) * e->atlas->line_spacing
@@ -133,6 +139,19 @@ editor_render(Editor* e, Renderer* r)
 						default_text_color);
 		}
 		renderer_flush(r);
+	}
+
+	/* Camera Update */
+	{
+		if(cursorpos.y < e->camera_limits.w) {
+			r->camera_pos.y -= FONTSIZE;
+			e->camera_limits.z -= FONTSIZE;
+			e->camera_limits.w -= FONTSIZE;
+		} else if(cursorpos.y + (float)cursorheight > e->camera_limits.z) {
+			r->camera_pos.y += FONTSIZE;
+			e->camera_limits.z += FONTSIZE;
+			e->camera_limits.w += FONTSIZE;
+		}
 	}
 }
 
@@ -161,4 +180,36 @@ editor_move_cursor_left(Editor* e)
 	if(e->cursor > 0) e->cursor -= 1;
 	// if(e->data.items[e->cursor] == '\n') e->cursor--;
 	if(e->data.items[e->cursor] == '\r') e->cursor--;
+}
+
+void
+editor_move_cursor_up(Editor* e)
+{
+	usize row = cursor_get_row(e);
+	if(row > 0) {
+		Line line = e->lines.items[row];
+		usize diff = e->cursor - line.begin;
+		Line nline = e->lines.items[row - 1];
+		if(nline.begin + diff < nline.end) {
+			e->cursor = nline.begin + diff;
+		} else {
+			e->cursor = nline.end;
+		}
+	}
+}
+
+void
+editor_move_cursor_down(Editor* e)
+{
+	usize row = cursor_get_row(e);
+	if(row < e->lines.count - 1) {
+		Line l = e->lines.items[row];
+		usize diff = e->cursor - l.begin;
+		Line nl = e->lines.items[row + 1];
+		if(nl.begin + diff < nl.end) {
+			e->cursor = nl.begin + diff;
+		} else {
+			e->cursor = nl.end;
+		}
+	}
 }

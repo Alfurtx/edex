@@ -16,6 +16,7 @@ set CFLAGS=%CFLAGS% -I %pdir%libs\glfw\include
 set CFLAGS=%CFLAGS% -I %pdir%libs\freetype\include
 set CFLAGS=%CFLAGS% -mwindows
 set CFLAGS=%CFLAGS% -MJ %pdir%compile_commands.json
+set CFLAGS=%CFLAGS% -D DEBUG_MEMLEAK=1
 
 set LFLAGS=-lopengl32
 set LFLAGS=%LFLAGS% -lshell32

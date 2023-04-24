@@ -26,6 +26,7 @@ GLFWwindow* window;
 static Renderer renderer = {};
 static GlyphAtlas ga = {};
 static Editor e = {};
+static Arena arena = {};
 
 void message_debug(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 void resize_window(GLFWwindow* wnd, int w, int h);
@@ -64,7 +65,7 @@ main(void)
 
 	glyph_atlas_init(&ga, ftface);
 	renderer_init(&renderer, window);
-	editor_init(&e, window, &ga);
+	editor_init(&e, window, &ga, &arena);
 	editor_load_file(&e, test2path);
 
 	while(!glfwWindowShouldClose(window)) {
@@ -84,7 +85,17 @@ main(void)
 	FT_Done_Face(ftface);
 	FT_Done_FreeType(ftlibrary);
         glfwTerminate();
-        return(0);
+
+	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+	_CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
+	_CrtSetReportFile(_CRT_WARN, _CRTDBG_FILE_STDOUT);
+	_CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDOUT);
+	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDOUT);
+
+	_CrtDumpMemoryLeaks();
+
+	return(0);
 }
 
 void
@@ -107,6 +118,12 @@ process_key_input(GLFWwindow* wnd, int key, int scancode, int action, int mods)
 	}
 	if(key == GLFW_KEY_H && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
 		editor_move_cursor_left(&e);
+	}
+	if(key == GLFW_KEY_J && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+		editor_move_cursor_down(&e);
+	}
+	if(key == GLFW_KEY_K && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+		editor_move_cursor_up(&e);
 	}
 }
 
