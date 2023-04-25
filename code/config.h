@@ -12,4 +12,18 @@ static vec4 default_text_color{.r = 160.0f / 255.0f, .g = 133.0f / 255.0f, .b = 
 static vec4 default_bg_color{.r = 22.0f / 255.0f, .g = 22.0f / 255.0f, .b = 22.0f / 255.0f, .a = 1.0f};
 static vec4 cursor_color{.r = 64.0f / 255.0f, .g = 255.0f / 255.0f, .b = 64.0f / 255.0f, .a = 1.0f};
 
+#if 1
+#if defined(_WIN32)
+static const char* eol_character = "\r\n";
+static const usize eol_offset = 2;
+#elif defined(__linux__) || defined(__APPLE__)
+static const char* eol_character = "\n";
+static const usize eol_offset = 0;
+#endif
+#else
+static const char* eol_character = "\n";
+static const usize eol_offset = 0;
+#endif
+
+
 #endif

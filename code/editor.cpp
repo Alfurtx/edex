@@ -10,7 +10,7 @@ rebuild_lines(Editor* e)
 		if(e->data.items[i] == '\n') {
 			line.end = i;
 			buffer_append(&e->lines, line);
-			line.begin = i+1;
+			line.begin = i + 1;
 		}
 	}
 	line.end = e->data.count;
@@ -68,6 +68,35 @@ cursor_get_width(Editor* e) {
 	}
 	return(w);
 }
+
+static void
+_print_cursor_info(Editor* e)
+{
+	int w,h; glfwGetWindowSize(e->window, &w, &h);
+	vec2 cursorpos = {};
+	float cursorwidth = cursor_get_width(e) == 0.0f ? e->atlas->characters['A'].ax : cursor_get_width(e);
+	long cursorheight = e->atlas->glyph_height + (e->atlas->line_spacing - e->atlas->glyph_height);
+	long ch_offset = e->atlas->descender;
+	{
+		usize row = cursor_get_row(e);
+		cursorpos.x = (-w / 2.0f) + cursor_get_pos(e);
+		cursorpos.y = (float) -((-h/2.0f) + (row + 1) * e->atlas->line_spacing);
+		cursorpos.y -= ch_offset;
+		cursorpos.y -= (float)(e->atlas->line_spacing - e->atlas->glyph_height) / 2;
+	}
+
+	if(e->data.items[e->cursor] == '\r') {
+		printf("LETRA: \\r | %d |", e->data.items[e->cursor]);
+	} else if(e->data.items[e->cursor] == '\n'){
+		printf("LETRA: \\n | %d |", e->data.items[e->cursor]);
+	} else {
+		printf("LETRA: %c | %d |", e->data.items[e->cursor], e->data.items[e->cursor]);
+	}
+	printf(" CURSOR: %zu |", e->cursor);
+	printf(" POSITION: x = %f , y = %f |", cursorpos.x, cursorpos.y);
+	printf("\n");
+}
+
 
 void
 editor_init(Editor* e, GLFWwindow* wnd, GlyphAtlas* ga, Arena* a)
@@ -144,13 +173,13 @@ editor_render(Editor* e, Renderer* r)
 	/* Camera Update */
 	{
 		if(cursorpos.y < e->camera_limits.w) {
-			r->camera_pos.y -= FONTSIZE;
-			e->camera_limits.z -= FONTSIZE;
-			e->camera_limits.w -= FONTSIZE;
+			r->camera_pos.y -= e->atlas->line_spacing;
+			e->camera_limits.z -= e->atlas->line_spacing;
+			e->camera_limits.w -= e->atlas->line_spacing;
 		} else if(cursorpos.y + (float)cursorheight > e->camera_limits.z) {
-			r->camera_pos.y += FONTSIZE;
-			e->camera_limits.z += FONTSIZE;
-			e->camera_limits.w += FONTSIZE;
+			r->camera_pos.y += e->atlas->line_spacing;
+			e->camera_limits.z += e->atlas->line_spacing;
+			e->camera_limits.w += e->atlas->line_spacing;
 		}
 	}
 }
@@ -169,17 +198,17 @@ editor_cleanup(Editor* e)
 void
 editor_move_cursor_right(Editor* e)
 {
-	if(e->cursor < e->data.count) e->cursor += 1;
-	if(e->data.items[e->cursor] == '\r') e->cursor++;
-	// if(e->data.items[e->cursor] == '\n') e->cursor++;
+	if(e->data.items[e->cursor] == eol_character[0]) e->cursor += eol_offset;
+	else if(e->cursor < e->data.count) e->cursor += 1;
+	_print_cursor_info(e);
 }
 
 void
 editor_move_cursor_left(Editor* e)
 {
-	if(e->cursor > 0) e->cursor -= 1;
-	// if(e->data.items[e->cursor] == '\n') e->cursor--;
-	if(e->data.items[e->cursor] == '\r') e->cursor--;
+	if(e->data.items[e->cursor] == eol_character[0]) e->cursor -= eol_offset;
+	else if(e->cursor > 0) e->cursor -= 1;
+	_print_cursor_info(e);
 }
 
 void
