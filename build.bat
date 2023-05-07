@@ -1,11 +1,10 @@
 @echo off
 
-
 setlocal
 set pdir=%~dp0%
 
 rem call "%pdir%generate_compile_commands.bat"
-call "E:\Windows Development Tools\Visual Studio\VC\Auxiliary\Build\vcvarsall.bat" x64
+call "E:\Home\Applications\Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64
 set glfw_lp=%pdir%libs\glfw\lib-vc2022
 set freetype_lp=%pdir%libs\freetype\release_static\vs2015-2022\win64
 

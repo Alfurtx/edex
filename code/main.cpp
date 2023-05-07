@@ -15,9 +15,11 @@
  */
 
 const char* testline = "HOLA NUEVO MUNDO";
-const char* fontpath = "w:\\edex\\fonts\\liberation_mono.ttf";
-const char* testpath = "w:\\edex\\test.txt";
-const char* test2path = "w:\\edex\\test2.txt";
+const char* fontpath =  "..\\fonts\\liberation_mono.ttf";
+// const char* fontpath =  "e:\\Home\\Work\\edex\\fonts\\liberation_mono.ttf";
+const char* testpath =  "e:\\Home\\Work\\edex\\test.txt";
+// const char* test2path = "e:\\Home\\Work\\edex\\test2.txt";
+const char* test2path = "..\\test2.txt";
 
 FT_Library ftlibrary;
 FT_Face ftface;
@@ -54,9 +56,22 @@ main(void)
 		fprintf(stderr, "WARNING: GLAD_GL_ARB_debug_output is not available");
 	}
 
+	char exe_path[512];
+	{ // trim the executable name out of the path and set it to a variable for relative path file loading
+		uint s = GetModuleFileNameA(0, exe_path, 512);
+		printf("EXECUTABLE_PATH: %s\n", exe_path);
+		uint exe_name_size = 8; // e d e x . e x e
+	        memset(&exe_path[s - exe_name_size], 0, exe_name_size);
+		printf("RELATIVE_PATH: %s\n", exe_path);
+	}
+
+	char font_load_path[512];
+	memcpy(font_load_path, exe_path, 512);
+	strcat(font_load_path, fontpath);
+
 	FT_Init_FreeType(&ftlibrary);
 
-	if(FT_New_Face(ftlibrary, fontpath, 0, &ftface)) {
+	if(FT_New_Face(ftlibrary, font_load_path, 0, &ftface)) {
 		fprintf(stderr, "FT_Face NOT initalized\n");
 		exit(1);
 	}
@@ -66,7 +81,11 @@ main(void)
 	glyph_atlas_init(&ga, ftface);
 	renderer_init(&renderer, window);
 	editor_init(&e, window, &ga, &arena);
-	editor_load_file(&e, test2path);
+
+	char testfile_rel_path[512];
+	memcpy(testfile_rel_path, exe_path, 512);
+	strcat(testfile_rel_path, test2path);
+	editor_load_file(&e, testfile_rel_path);
 
 	while(!glfwWindowShouldClose(window)) {
 		glClearColor(default_bg_color.r,

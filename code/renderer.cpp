@@ -3,10 +3,10 @@
 /*
  * TODO(fonsi): make this independent of path
  */
-static const char* vertexpath = "w:\\edex\\shaders\\simple.vert";
+static const char* vertexpath = "e:\\Home\\Work\\edex\\shaders\\simple.vert";
 static const char* shaderpath[SHADER_COUNT] = {
-	"w:\\edex\\shaders\\color.frag",
-	"w:\\edex\\shaders\\text.frag",
+	"e:\\Home\\Work\\edex\\shaders\\color.frag",
+	"e:\\Home\\Work\\edex\\shaders\\text.frag",
 };
 static const char* uniform_names[UNIFORM_COUNT] = {
 	"u_time",

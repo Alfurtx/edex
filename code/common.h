@@ -5,19 +5,12 @@
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
-
-#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
 #include <stdlib.h>
 
-#if 0
-# if defined(DEBUG_MEMLEAK) && defined(_WIN32)
-#  define _CRTDBG_MAP_ALLOC
-#  include <stdlib.h>
-#  include <crtdbg.h>
-# else
-#  include <stdlib.h>
-# endif
+#if defined(_WIN32)
+#define _CRTDBG_MAP_ALLOC
+#include <crtdbg.h>
+#include <windows.h>
 #endif
 
 #define GLFW_INCLUDE_NONE
