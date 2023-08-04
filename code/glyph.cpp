@@ -66,7 +66,7 @@ glyph_atlas_render_line(GlyphAtlas* a, Renderer* r,
 		}
 		GlyphInfo gi = a->characters[char_index];
 		float x = pos.x + gi.bl;
-		float y = pos.y - gi.bt;
+		float y = -pos.y - gi.bt;
 		float w = gi.bw;
 		float h = gi.bh;
 		pos.x += gi.ax;

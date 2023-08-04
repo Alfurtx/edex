@@ -22,7 +22,6 @@
 #define SCREEN_W 1920
 #define SCREEN_H 1080
 #define Max(a, b) ((a) < (b) ? (b) : (a))
-#define FONTSIZE 48
 #define DEFAULT_CAP 512
 #define KB(v) (1024LL * v)
 #define MB(v) (1024LL * KB(v))

@@ -3,6 +3,8 @@
 
 #include "common.h"
 
+static const int FONTSIZE = 48;
+
 static vec4 red{ .r = 1.0f, .g = 0.0f, .b = 0.0f, .a = 1.0f };
 static vec4 green{ .r = 0.0f, .g = 1.0f, .b = 0.0f, .a = 1.0f };
 static vec4 blue{ .r = 0.0f, .g = 0.0f, .b = 1.0f, .a = 1.0f };
@@ -25,5 +27,7 @@ static const char* eol_character = "\n";
 static const usize eol_offset = 0;
 #endif
 
+// UI Configuration
+static const float modeline_height = (float)FONTSIZE;
 
 #endif

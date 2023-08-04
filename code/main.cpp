@@ -3,15 +3,12 @@
 #include "renderer.h"
 #include "glyph.h"
 #include "editor.h"
+#include "ui.h"
 
 /*
  * TODO:
  * -> Colorscheme stuff:
  * How to separate foreground color from background color (eg. have a bg and fg for the cursor)
- * -> Change the text + cursor rendering position calculations
- * The text and cursor are positioned based on the screen coordinates which is insanly bad
- * because it doesn't allow for good "camera" scrolling as well as having text be outside the
- * cursor when you have it hover over a character, etc.
  */
 
 const char* testline = "HOLA NUEVO MUNDO";
@@ -29,6 +26,7 @@ static Renderer renderer = {};
 static GlyphAtlas ga = {};
 static Editor e = {};
 static Arena arena = {};
+static UI ui = {};
 
 void message_debug(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 void resize_window(GLFWwindow* wnd, int w, int h);
@@ -59,10 +57,8 @@ main(void)
 	char exe_path[512];
 	{ // trim the executable name out of the path and set it to a variable for relative path file loading
 		uint s = GetModuleFileNameA(0, exe_path, 512);
-		printf("EXECUTABLE_PATH: %s\n", exe_path);
 		uint exe_name_size = 8; // e d e x . e x e
 	        memset(&exe_path[s - exe_name_size], 0, exe_name_size);
-		printf("RELATIVE_PATH: %s\n", exe_path);
 	}
 
 	char font_load_path[512];
@@ -81,6 +77,7 @@ main(void)
 	glyph_atlas_init(&ga, ftface);
 	renderer_init(&renderer, window);
 	editor_init(&e, window, &ga, &arena);
+	ui_init(&ui, &e, &renderer);
 
 	char testfile_rel_path[512];
 	memcpy(testfile_rel_path, exe_path, 512);
@@ -95,6 +92,7 @@ main(void)
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		editor_render(&e, &renderer);
+		ui_render(&ui);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -108,9 +108,12 @@ editor_init(Editor* e, GLFWwindow* wnd, GlyphAtlas* ga, Arena* a)
 
 	int w,h; glfwGetWindowSize(wnd, &w, &h);
 	e->camera_limits = {
-		.x = w/2.0f, .y = -w/2.0f,
-		.z = h/2.0f, .w = -h/2.0f
+		.x = (float)w/2.0f, .y = (float)-w/2.0f,
+		.z = (float)h/2.0f, .w = (float)-h/2.0f
 	};
+
+	// set camera_limits taking into account the UI
+	// e->camera_limits.w += modeline_height;
 }
 
 void
@@ -156,8 +159,9 @@ editor_render(Editor* e, Renderer* r)
 		renderer_set_shader(r, SHADER_TEXT);
 		for(usize i = 0; i < e->lines.count; i++) {
 			vec2 t = vec2{
-				-(w/2.0f),
-				(float) (-h / 2.0f) + (i + 1) * e->atlas->line_spacing
+				-(w / 2.0f),
+				// -(h / 2.0f) + (e->lines.count - i) * e->atlas->line_spacing
+				(h / 2.0f) - (i + 1) * e->atlas->line_spacing
 			};
 			Line l = e->lines.items[i];
 			glyph_atlas_render_line(e->atlas,
@@ -200,7 +204,7 @@ editor_move_cursor_right(Editor* e)
 {
 	if(e->data.items[e->cursor] == eol_character[0]) e->cursor += eol_offset;
 	else if(e->cursor < e->data.count) e->cursor += 1;
-	_print_cursor_info(e);
+	// _print_cursor_info(e);
 }
 
 void
@@ -208,7 +212,7 @@ editor_move_cursor_left(Editor* e)
 {
 	if(e->data.items[e->cursor] == eol_character[0]) e->cursor -= eol_offset;
 	else if(e->cursor > 0) e->cursor -= 1;
-	_print_cursor_info(e);
+	// _print_cursor_info(e);
 }
 
 void
